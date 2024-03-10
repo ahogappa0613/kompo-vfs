@@ -84,7 +84,7 @@ enum Ruby {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn get_patch_require() -> *const c_char {
+pub unsafe extern "C" fn get_kompo_patch() -> *const c_char {
     let data = FS_DATA.get_or_init(set_fs);
     let binding = Path::new("/root/kompo_patch.rb");
     let script = data.get_file(binding).expect("Not found pacth_require.rb");
