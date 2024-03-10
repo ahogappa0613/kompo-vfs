@@ -144,7 +144,7 @@ unsafe extern "C" fn get_file_from_fs_func(_: VALUE, rb_path: VALUE) -> VALUE {
             std::path::Component::Prefix(_) => todo!(), // for windows
             std::path::Component::RootDir => norm_path.push("/"),
             std::path::Component::CurDir => {
-                // nothing to do
+                // do nothing
             }
             std::path::Component::ParentDir => {
                 norm_path.pop();
@@ -186,9 +186,9 @@ fn set_fs() -> Fs<'static> {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Init_fs() {
+pub unsafe extern "C" fn Init_kompo_fs() {
     // define ruby class
-    let c_name = CString::new("Fs").unwrap();
+    let c_name = CString::new("KompoFs").unwrap();
     let get_start_file_script = CString::new("get_start_file_script").unwrap();
     let get_start_file_name = CString::new("get_start_file_name").unwrap();
     let get_load_paths = CString::new("get_load_paths").unwrap();
