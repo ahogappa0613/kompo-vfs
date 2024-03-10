@@ -200,6 +200,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "kompo"
+version = "0.1.0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "kompo-cli"
 version = "0.1.0"
 dependencies = [
@@ -208,13 +215,6 @@ dependencies = [
  "glob",
  "memmap2",
  "object",
-]
-
-[[package]]
-name = "kompo-fs"
-version = "0.1.0"
-dependencies = [
- "libc",
 ]
 
 [[package]]
