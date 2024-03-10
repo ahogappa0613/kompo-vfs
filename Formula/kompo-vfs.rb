@@ -3,6 +3,7 @@ class KompoVfs < Formula
   homepage "https://github.com/ahogappa0613/kompo-vfs"
   url "https://github.com/ahogappa0613/kompo-vfs.git", using: :git
   head "https://github.com/ahogappa0613/kompo-vfs.git", branch: "main"
+  version "0.1.0"
 
   depends_on "rust" => :build
 
