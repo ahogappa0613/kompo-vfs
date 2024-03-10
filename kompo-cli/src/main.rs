@@ -4,7 +4,7 @@ use std::fs::{self, File};
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-const RUBY_REQUIRE_PATCH_SRC: &[u8] = include_bytes!("./packager_patch.rb");
+const RUBY_REQUIRE_PATCH_SRC: &[u8] = include_bytes!("./kompo_patch.rb");
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -127,7 +127,7 @@ fn main() {
     }
 
     let mut patch = RUBY_REQUIRE_PATCH_SRC.to_vec();
-    paths.push(PathBuf::from("/root/patch_require.rb"));
+    paths.push(PathBuf::from("/root/kompo_patch.rb.rb"));
     register_bytes(&mut scripts, &mut starts_and_ends, &mut patch);
 
     // Register the path only when .so file

@@ -1,4 +1,4 @@
-FS_LOAD_PATHS = Fs.get_load_paths
+FS_LOAD_PATHS = KompoFS.get_load_paths
 AUTOLOAD_MAP = {}
 EXTS=['.rb','.so']
 class Module
@@ -39,7 +39,7 @@ module Kernel
     script = file_path = nil
     FS_LOAD_PATHS.each do |load_path|
       file_path = File.join(load_path, find_path)
-      break if (script = Fs.get_file_from_fs(file_path))
+      break if (script = KompoFS.get_file_from_fs(file_path))
     end
     eval_or_require_extension(script, file_path, file, force: true)
   rescue LoadError => e
@@ -56,11 +56,11 @@ module Kernel
       if File.extname(find_path) == ''
         EXTS.each do |ext|
           file_path = find_path + ext
-          break if (script = Fs.get_file_from_fs(file_path))
+          break if (script = KompoFS.get_file_from_fs(file_path))
         end
       else
         file_path = find_path
-        script = Fs.get_file_from_fs(file_path)
+        script = KompoFS.get_file_from_fs(file_path)
       end
     else
       if File.extname(file) == ''
@@ -68,14 +68,14 @@ module Kernel
           EXTS.each do |ext|
             find_path = file + ext
             file_path = File.join(load_path, find_path)
-            break if (script = Fs.get_file_from_fs(file_path))
+            break if (script = KompoFS.get_file_from_fs(file_path))
           end
           break if script
         end
       else
         FS_LOAD_PATHS.each do |load_path|
           file_path = File.join(load_path, find_path)
-          break if (script = Fs.get_file_from_fs(file_path))
+          break if (script = KompoFS.get_file_from_fs(file_path))
         end
       end
     end
@@ -99,11 +99,11 @@ module Kernel
       EXTS.each do |ext|
         find_path = file + ext
         file_path = File.expand_path(File.join(call_dir, find_path))
-        break if (script = Fs.get_file_from_fs(file_path))
+        break if (script = KompoFS.get_file_from_fs(file_path))
       end
     else
       file_path = File.expand_path(File.join(call_dir, find_path))
-      script = Fs.get_file_from_fs(file_path)
+      script = KompoFS.get_file_from_fs(file_path)
     end
     eval_or_require_extension(script, file_path, file)
   rescue LoadError => e
@@ -146,17 +146,17 @@ end
 module PATCH
   refine File do
     def File.read(file)
-      Fs.get_file_from_fs(file)
+      KompoFS.get_file_from_fs(file)
     end
   end
 end
-class Fs
+class KompoFS
   using PATCH
   def self.pack_context
     yield FS_LOAD_PATHS[0]
   end
 end
-Fs.pack_context do |_context|
+KompoFS.pack_context do |_context|
   require 'rubygems'
 end
-RubyVM::InstructionSequence.compile(Fs.get_start_file_script, Fs.get_start_file_name, Fs.get_start_file_name).eval
+RubyVM::InstructionSequence.compile(KompoFS.get_start_file_script, KompoFS.get_start_file_name, KompoFS.get_start_file_name).eval
