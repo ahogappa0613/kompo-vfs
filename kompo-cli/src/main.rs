@@ -127,7 +127,7 @@ fn main() {
     }
 
     let mut patch = RUBY_REQUIRE_PATCH_SRC.to_vec();
-    paths.push(PathBuf::from("/root/kompo_patch.rb.rb"));
+    paths.push(PathBuf::from("/root/kompo_patch.rb"));
     register_bytes(&mut scripts, &mut starts_and_ends, &mut patch);
 
     // Register the path only when .so file
