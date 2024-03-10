@@ -1,0 +1,4 @@
+[workspace]
+
+members = ["kompo-cli", "kompo-fs"]
+resolver = "2"
