@@ -30,9 +30,9 @@ module Kernel
   private :original_require
   alias original_require_relative require_relative
   private :original_require_relative
-  alias original_autoload autoload
-  private :original_load
   alias original_load load
+  private :original_load
+  alias original_autoload autoload
   # TODO: private opt
   def load(file, priv=false)
     find_path = file
