@@ -13,14 +13,14 @@ struct Args {
     /// Specify absolute path.
     context: PathBuf,
 
-    /// Packing dirs, files or gems.(e.g. dir/, file.rb, gem_name)
-    /// These paths are use with `context' path, and if reading from FS fails, the path is used as the relative path from the executable's location instead
-    /// so not support absolute path like start with `/' (e.g. /no_support_path)
-    dir_or_file_or_gems: Vec<String>,
+    /// Packing dirs, files or gems.(e.g. dir/, file.rb)
+    // These paths are use with `context' path, and if reading from FS fails, the path is used as the relative path from the executable's location instead
+    // so not support absolute path like start with `/' (e.g. /no_support_path)
+    dir_or_file: Vec<String>,
 
     /// Start up file.
     #[arg(short, long, default_value = "main.rb")]
-    start: PathBuf,
+    entrypoint: PathBuf,
 
     /// TODO
     /// start args
@@ -85,8 +85,8 @@ fn register_bytes(scripts: &mut Vec<u8>, starts_and_ends: &mut Vec<u64>, bytes: 
 fn main() {
     let args = Args::parse();
     let context = args.context.clone();
-    let dir_or_file_or_gems = args.dir_or_file_or_gems.clone();
-    let absolute_start_file_path = context.join(args.start);
+    let dir_or_file = args.dir_or_file.clone();
+    let absolute_start_file_path = context.join(args.entrypoint);
 
     let mut starts_and_ends = vec![0u64];
     let mut scripts: Vec<u8> = vec![];
@@ -99,7 +99,7 @@ fn main() {
         &absolute_start_file_path,
     );
 
-    for dir_or_file_or_gem in dir_or_file_or_gems.iter() {
+    for dir_or_file_or_gem in dir_or_file.iter() {
         let mut path = PathBuf::from(dir_or_file_or_gem);
 
         if path.is_file() {
@@ -131,7 +131,7 @@ fn main() {
     register_bytes(&mut scripts, &mut starts_and_ends, &mut patch);
 
     // Register the path only when .so file
-    for dir_or_file_or_gem in dir_or_file_or_gems.iter() {
+    for dir_or_file_or_gem in dir_or_file.iter() {
         let mut path = PathBuf::from(dir_or_file_or_gem);
         path.push("**/*.so");
 
@@ -252,7 +252,7 @@ fn main() {
     });
 
     let mut fs_load_paths = vec![context.to_string_lossy().to_string()];
-    fs_load_paths.append(&mut dir_or_file_or_gems.clone());
+    fs_load_paths.append(&mut dir_or_file.clone());
     let fs_load_paths = fs_load_paths.join(",");
     let context_id = object.add_symbol(object::write::Symbol {
         name: "LOAD_PATHS".bytes().collect::<Vec<u8>>(),
