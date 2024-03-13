@@ -31,8 +31,8 @@ module Kernel
   alias original_require_relative require_relative
   private :original_require_relative
   alias original_autoload autoload
-  alias original_load load
   private :original_load
+  alias original_load load
   # TODO: private opt
   def load(file, priv=false)
     find_path = file
@@ -108,7 +108,7 @@ module Kernel
     eval_or_require_extension(script, file_path, file)
   rescue LoadError => e
     find_path = file
-    file_path = File.expand_path(File.join(call_dir, find_path))
+    # file_path = File.expand_path(File.join(call_dir, find_path))
     # puts "require_relative local #{file_path}"
     original_require_relative(file_path)
   rescue SyntaxError => e
