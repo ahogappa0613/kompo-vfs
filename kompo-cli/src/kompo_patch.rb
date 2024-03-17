@@ -4,13 +4,11 @@ EXTS=['.rb','.so']
 class Module
   alias original_autoload autoload
   def autoload(const, file)
-    # p "module autoload: #{self}"
     AUTOLOAD_MAP[file] = [self, const, false]
     original_autoload(const, file)
   end
 end
 def autoload(const, file)
-  # p "kernel autoload"
   Object.autoload(const, file)
 end
 alias original_caller_locations caller_locations
@@ -44,7 +42,6 @@ module Kernel
     eval_or_require_extension(script, file_path, file, force: true)
   rescue LoadError => e
     find_path = file
-    # puts "load local #{find_path}"
     original_load(find_path)
   rescue SyntaxError => e
     puts e.message
@@ -81,13 +78,7 @@ module Kernel
     end
     eval_or_require_extension(script, file_path, file)
   rescue LoadError => e
-    # if File.extname(find_path) == '.so'
-    #   puts "require static linked extension #{find_path}"
-    # else
-    #   puts "require local #{find_path}"
-    # end
-    find_path = file
-    original_require(find_path)
+    original_require(file)
   rescue SyntaxError => e
     puts e.message
   end
@@ -107,10 +98,7 @@ module Kernel
     end
     eval_or_require_extension(script, file_path, file)
   rescue LoadError => e
-    find_path = file
-    # file_path = File.expand_path(File.join(call_dir, find_path))
-    # puts "require_relative local #{file_path}"
-    original_require_relative(file_path)
+    original_require_relative(file)
   rescue SyntaxError => e
     puts e.message
   end
@@ -127,17 +115,14 @@ module Kernel
         return map[0].const_get(map[1])
       end
       if !force && $LOADED_FEATURES.include?(file_path)
-        # puts "already loaded: #{file_path}"
         return false
       end
       $LOADED_FEATURES << file_path
       $LOADED_FEATURES.uniq!
       if File.extname(file_path) == '.rb'
-        # puts "eval file path: #{file_path}"
         RubyVM::InstructionSequence.compile(script, file_path, file_path).eval
         return true
       else
-        # puts "require native extension #{File.basename(file_path)}"
         original_require(File.basename(file_path))
       end
     end
