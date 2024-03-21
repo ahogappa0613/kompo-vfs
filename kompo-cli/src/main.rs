@@ -1,6 +1,6 @@
 use clap::{Parser, ValueEnum};
 use object::*;
-use std::fs::{self, File};
+use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
@@ -36,9 +36,6 @@ struct Args {
     /// compress ruby files with gzip
     #[arg(long)]
     compression: bool,
-
-    #[arg(long)]
-    ruby_static: Option<String>,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -297,40 +294,4 @@ fn main() {
     let result = object.write().unwrap();
     let mut file = File::create("fs.o").unwrap();
     file.write_all(&result).unwrap();
-
-    let file_path = args.ruby_static.unwrap_or(
-        std::env::var("LIB_RUBY").unwrap_or("/usr/local/lib/libruby-static.a".to_string()),
-    );
-    let file = match fs::File::open(&file_path) {
-        Ok(file) => file,
-        Err(err) => {
-            println!("Failed to open file '{}': {}", file_path, err,);
-            return;
-        }
-    };
-    let file = match unsafe { memmap2::Mmap::map(&file) } {
-        Ok(mmap) => mmap,
-        Err(err) => {
-            println!("Failed to map file '{}': {}", file_path, err,);
-            return;
-        }
-    };
-    let archive = match object::read::archive::ArchiveFile::parse(&*file) {
-        Ok(file) => file,
-        Err(err) => {
-            println!("Failed to parse file '{}': {}", file_path, err);
-            return;
-        }
-    };
-
-    for (i, member) in archive.members().enumerate() {
-        let member = member.unwrap();
-        let name = String::from_utf8_lossy(member.name());
-
-        if !name.starts_with("dmy") {
-            let data = member.data(&file[..]).unwrap();
-            let mut file = File::create(format!("{i:0>3}.o")).unwrap();
-            file.write_all(&data).unwrap();
-        }
-    }
 }
