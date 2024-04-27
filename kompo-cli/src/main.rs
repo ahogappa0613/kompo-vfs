@@ -295,3 +295,49 @@ fn main() {
     let mut file = File::create("fs.o").unwrap();
     file.write_all(&result).unwrap();
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn register_bytes_test() {
+        use super::*;
+
+        let mut scripts = vec![0];
+        let mut starts_and_ends = vec![0u64];
+        let mut bytes = vec![1, 2, 3, 4, 5];
+
+        register_bytes(&mut scripts, &mut starts_and_ends, &mut bytes);
+
+        assert_eq!(scripts, vec![0, 1, 2, 3, 4, 5, 0]);
+        assert_eq!(starts_and_ends, vec![0, 6]);
+    }
+
+    #[test]
+    fn register_file_test() {
+        use super::*;
+
+        let mut scripts = vec![0];
+        let mut starts_and_ends = vec![0u64];
+        let mut paths = vec![];
+        let path = std::env::current_dir().unwrap();
+        println!("starting dir: {}", path.display());
+        let path = PathBuf::from("./test_files/test.rb");
+
+        register_file(&mut scripts, &mut starts_and_ends, &mut paths, &path);
+
+        assert_eq!(scripts.len(), 19);
+        assert_eq!(
+            scripts,
+            vec![
+                b'\0', b'p', b' ', b'\'', b'H', b'e', b'l', b'l', b'o', b' ', b'W', b'o', b'r',
+                b'l', b'd', b'!', b'\'', b'\n', b'\0'
+            ]
+        );
+
+        assert_eq!(starts_and_ends.len(), 2);
+        assert_eq!(starts_and_ends, vec![0, 18]);
+
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths, vec![path]);
+    }
+}
