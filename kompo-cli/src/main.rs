@@ -119,7 +119,8 @@ fn main() {
                 }
             }
         } else {
-            unreachable!("not found dir: {}", path.display());
+            println!("not found dir: {}", path.display());
+            continue;
         }
     }
 
